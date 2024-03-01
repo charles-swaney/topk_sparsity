@@ -1,6 +1,4 @@
 import torch
-import numpy as np
-import torch.optim as optim
 import time
 import os 
 
