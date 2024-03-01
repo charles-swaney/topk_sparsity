@@ -1,10 +1,6 @@
 import torch
 import torch.nn as nn
-import torchvision
-import torchvision.models as models
 import torch.nn.functional as F
-from torchvision.models.vision_transformer import VisionTransformer
-
 
 class TopkViT(nn.Module):
     '''
@@ -16,11 +12,7 @@ class TopkViT(nn.Module):
         self.model = model
         self.k_value = k_value
         for i in range(12):
-            encoder_layer = self.model.encoder.layers[i]
-            mlp_layer = encoder_layer.mlp
-            for name, module in mlp_layer.named_children():
-                if isinstance(module, nn.GELU):
-                    setattr(mlp_layer, name, TopkGELU(self.k_value))
+            model.encoder.layers[i].mlp[1] = TopkGELU(self.k_value)
     def forward(self, x):
         x = x.to(self.device)
         return self.model(x)
