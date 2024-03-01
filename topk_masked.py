@@ -6,17 +6,16 @@ import torch.nn.functional as F
 from torchvision.models.vision_transformer import VisionTransformer
 
 
-class CifarTopkViT(nn.Module):
+class TopkViT(nn.Module):
     '''
-    ViT for CIFAR10
+    masked ViT
     '''
-    def __init__(self,  k_value, num_layers=12):
-        super(CifarTopkViT, self).__init__()
+    def __init__(self,  model, k_value):
+        super(TopkViT, self).__init__()
         self.device = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
-        self.model = VisionTransformer(image_size=32, patch_size=4, num_layers=num_layers, num_heads=12, hidden_dim=768, mlp_dim=3072,
-                                       dropout=.5, attention_dropout=.5, num_classes=10)
+        self.model = model
         self.k_value = k_value
-        for i in range(num_layers):
+        for i in range(12):
             encoder_layer = self.model.encoder.layers[i]
             mlp_layer = encoder_layer.mlp
             for name, module in mlp_layer.named_children():
