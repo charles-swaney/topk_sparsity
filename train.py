@@ -16,7 +16,7 @@ def save_checkpoint(model, optimizer, epoch, time_taken, loss, accuracy, lr, dir
     os.makedirs(dir, exist_ok=True)
     torch.save(checkpoint, filepath)
 
-def train(model, dataloader, num_epochs, criterion, optimizer, device='cuda'):
+def train(model, dataloader, num_epochs, criterion, optimizer, scheduler, device='cuda'):
     losses = []
     trainAcc = []
     model = model.to(device).train()
@@ -40,6 +40,8 @@ def train(model, dataloader, num_epochs, criterion, optimizer, device='cuda'):
             trainAcc.append(accuracy)
             losses.append(loss.detach().cpu().numpy())
             current_learning_rate = optimizer.param_groups[0]['lr']
+        
+        scheduler.step()
 
         if epoch % 20 == 0 and epoch > 0:
             t2 = time.time()
@@ -49,5 +51,5 @@ def train(model, dataloader, num_epochs, criterion, optimizer, device='cuda'):
                                     current_learning_rate, dir='models', filename=f'checkpoint_epoch_{epoch}.pth')
             else:
                 save_checkpoint(model, optimizer, epoch, elapsed, loss, accuracy, 
-                                    current_learning_rate, dir='models', filename=f'final_checkpoint.pth')
+                                    current_learning_rate, dir='models', filename=f'final.pth')
 
