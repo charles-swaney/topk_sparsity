@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.nn.init as init
 
 class TopkViT(nn.Module):
     '''
@@ -39,3 +40,12 @@ class TopkGELU(nn.Module):
     def forward(self, x):
         x = self.top_k_mask(F.gelu(x), self.k)
         return x
+    
+def initialize_weights(model):
+    for module in model.modules():
+        if isinstance(module, nn.Linear):
+            init.xavier_uniform_(module.weight)
+            init.zeros_(module.bias)
+        elif isinstance(module, nn.LayerNorm):
+            init.ones_(module.weight)
+            init.zeros_(module.bias)
