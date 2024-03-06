@@ -34,7 +34,10 @@ def load_cifar10(root='./data', train=True, download=True, batch_size=128, num_w
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])
     ])
-    dataset = datasets.CIFAR10(root=root, train=train, download=download, transform=test_transform)
+    if train:
+        dataset = datasets.CIFAR10(root=root, train=train, download=download, transform=train_transform)
+    else:
+        dataset = datasets.CIFAR10(root=root, train=train, download=download, transform=test_transform)
 
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=train, num_workers=num_workers)
     return dataloader

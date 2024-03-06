@@ -2,8 +2,6 @@ import torch
 import time
 import os 
 
-test_interval = 10
-
 def save_checkpoint(model, optimizer, epoch, time_taken, loss, accuracy, lr, dir='models', filename='checkpoint.pth'):
     filepath = os.path.join(dir, filename)
     checkpoint = {
@@ -18,7 +16,7 @@ def save_checkpoint(model, optimizer, epoch, time_taken, loss, accuracy, lr, dir
     os.makedirs(dir, exist_ok=True)
     torch.save(checkpoint, filepath)
 
-def train(model, train_dataloader, test_dataloader, num_epochs, criterion, optimizer, scheduler, device='cuda'):
+def train(model, train_dataloader, test_dataloader, num_epochs, criterion, optimizer, scheduler, test_interval=5, device='cuda'):
     losses = []
     trainAcc = []
     model = model.to(device).train()

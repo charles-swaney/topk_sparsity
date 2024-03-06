@@ -13,21 +13,21 @@ class TopkViT(nn.Module):
         self.model = model
         self.k_value = k_value
         for i in range(12):
-            model.encoder.layers[i].mlp[1] = TopkGELU(self.k_value)
+            model.encoder.layers[i].mlp[1] = TopkGeLU(self.k_value)
     def forward(self, x):
         x = x.to(self.device)
         return self.model(x)
 
-class TopkGELU(nn.Module):
+class TopkGeLU(nn.Module):
     def __init__(self, k):
-        super(TopkGELU, self).__init__()
+        super(TopkGeLU, self).__init__()
         self.k = k
 
     def top_k_mask(self, matrix, k):
         '''
         Inputs:
             matrix: the matrix to apply the mask to
-            k: number of elements in each row (corresponding to input vectors) to be nonzero
+            k: number of elements in each row to be nonzero
         Outputs:
             masked: masked version of matrix with only top k within each row nonzero
       '''
