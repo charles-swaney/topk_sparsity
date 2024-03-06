@@ -37,11 +37,12 @@ def main():
         models.append(masked)
 
     train_loader = load_cifar10(root='./data', train=True, download=True, batch_size=128, num_workers=4)
+    test_loader = load_cifar10(root='./data', train=False, download=True, batch_size=512, num_workers=4)
 
     for model in models:
         optimizer = optim.Adam(model.parameters(), lr=5e-4)
         scheduler = WarmupCosineAnnealingLR(optimizer, warmup_epochs=5, max_epochs=num_epochs, warmup_factor=.1, last_epoch=-1)
-        train(model, train_loader, num_epochs, criterion, optimizer, scheduler, device)
+        train(model, train_loader, test_loader, num_epochs, criterion, optimizer, scheduler, device)
 
 if __name__ == '__main__':
     main()
