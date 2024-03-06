@@ -25,15 +25,12 @@ def load_cifar10(root='./data', train=True, download=True, batch_size=128, num_w
     if download:
         download_cifar10(root)
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(degrees=15),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]),
     ])
     test_transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])
     ])
