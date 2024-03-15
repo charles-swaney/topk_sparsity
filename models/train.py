@@ -1,8 +1,9 @@
 import torch
-import time
 import os 
+from torch.utils.tensorboard import SummaryWriter
 
-def save_checkpoint(model, optimizer, epoch, dir='models', filename='checkpoint.pth'):
+
+def save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename='checkpoint.pth'):
     filepath = os.path.join(dir, filename)
     checkpoint = {
         'epoch': epoch,
@@ -12,18 +13,26 @@ def save_checkpoint(model, optimizer, epoch, dir='models', filename='checkpoint.
     os.makedirs(dir, exist_ok=True)
     torch.save(checkpoint, filepath)
 
+
 def train(model, config, train_dataloader, test_dataloader, scheduler, device='cuda'):
-    losses = []
-    trainAcc = []
+    
+    k_value_part = f"_masked_{config['k_value']}" if 'k_value' in config else ""
+    experiment_name = f'vit{k_value_part}'
+    writer = SummaryWriter(f'runs/{experiment_name}')
+
     num_epochs = config['num_epochs']
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
     test_interval = config['test_interval']
     model = model.to(device).train()
-    t1 = time.time()
     best_loss = 10 ** 4
 
     for epoch in range(num_epochs):
+        model.train()
+        epoch_loss = 0.0
+        correct = 0
+        total = 0
+        
         for x, y in train_dataloader:
             x, y = x.to(device), y.to(device)
 
@@ -33,28 +42,33 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
-            preds = torch.argmax(output, dim=1)
-            num_correct = (preds == y).sum()
-            num_samples = preds.size(0)
-            accuracy = num_correct / num_samples
-            trainAcc.append(accuracy)
-            losses.append(loss.detach().cpu().numpy())
-            current_learning_rate = optimizer.param_groups[0]['lr']
+            
+            epoch_loss += loss.item() * x.size(0)
+            _, predicted = torch.max(output, 1)
+            correct += (predicted == y).sum().item()
+            total += y.size(0)
         
         scheduler.step()
 
+        epoch_loss = epoch_loss / len(train_dataloader.dataset)
+        epoch_accuracy = correct / total
+
+        save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_latest_checkpoint.pth')
+        writer.add_scalar('Loss/Train', epoch_loss, epoch)
+        writer.add_scalar('Accuracy/Train', epoch_accuracy, epoch)
+
         if epoch % test_interval == 0 and epoch > 0:
 
-            t2 = time.time()
-            elapsed = t2 - t1
+            current_loss, test_accuracy = evaluate(model=model, dataloader=test_dataloader, criterion=criterion, device='cuda')
 
-            current_loss = evaluate(model=model, dataloader=test_dataloader, criterion=criterion, device='cuda')
+            writer.add_scalar('Loss/Test', current_loss, epoch)
+            writer.add_scalar('Accuracy/Test', test_accuracy, epoch)
 
             if current_loss < best_loss:
                 best_loss = current_loss
-                save_checkpoint(model, optimizer, epoch, elapsed, loss.item(), accuracy, current_learning_rate, dir='models',
-                                filename=f'checkpoint_epoch_{epoch}.pth')
+                save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_best_checkpoint.pth')
+    writer.close()
+
 
 def evaluate(model, dataloader, criterion, device='cuda'):
     model = model.to(device).eval()
@@ -77,4 +91,4 @@ def evaluate(model, dataloader, criterion, device='cuda'):
     mean_loss = sum(test_losses) / len(test_losses)
 
     print(f'Test Loss: {mean_loss}, Test Accuracy: {test_accuracy}')
-    return mean_loss
+    return mean_loss, test_accuracy
