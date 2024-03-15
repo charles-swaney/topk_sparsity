@@ -37,7 +37,8 @@ def main():
     model = initialize_model(model_config).to(config['device'])
 
     optimizer = optim.Adam(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
-    scheduler = CosineAnnealingWarmupRestarts(optimizer=optimizer, first_cycle_steps=config['warmup'])
+    scheduler = CosineAnnealingWarmupRestarts(optimizer=optimizer, 
+                                              first_cycle_steps=config['first_cycle_steps'], warmup_steps=config['warmup_steps'])
     train(model, config, train_loader, test_loader, scheduler, device=config['device'])
 
 if __name__ == '__main__':

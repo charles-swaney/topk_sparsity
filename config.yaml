@@ -44,9 +44,10 @@ models:
 dataset_path: "./data"
 save_path: "./models"
 lr: 0.003
-warmup: 10
+num_epochs: 300
+warmup_steps: 10
+first_cycle_steps: 290
 weight_decay: 0.05
-num_epochs: 200
 test_interval: 5
 device: 'cuda'
 
