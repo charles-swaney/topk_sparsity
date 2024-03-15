@@ -1,4 +1,5 @@
-# ViT config
+# ViT config using https://arxiv.org/pdf/2112.13492.pdf
+
 vit_params: &vit_params
   image_size: 32
   patch_size: 4
@@ -9,6 +10,7 @@ vit_params: &vit_params
   num_classes: 10
 
 # TopkViT model configs
+
 models: 
   vit:
     <<: *vit_params
