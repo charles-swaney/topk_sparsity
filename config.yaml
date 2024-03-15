@@ -1,4 +1,4 @@
-# ViT config using https://arxiv.org/pdf/2112.13492.pdf
+# Base ViT config using https://arxiv.org/pdf/2112.13492.pdf
 
 vit_params: &vit_params
   image_size: 32
@@ -9,10 +9,10 @@ vit_params: &vit_params
   mlp_dim: 384
   num_classes: 10
 
-# TopkViT model configs
+# Model configs
 
 models: 
-  vit:
+  vit_base:
     <<: *vit_params
 
   vit_masked_8:
@@ -48,3 +48,10 @@ warmup: 10
 weight_decay: 0.05
 num_epochs: 200
 test_interval: 5
+device: 'cuda'
+
+# Dataloader config
+
+train_batch_size: 128
+test_batch_size: 512
+num_workers: 4
