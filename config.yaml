@@ -1,0 +1,48 @@
+# ViT config
+vit_params: &vit_params
+  image_size: 32
+  patch_size: 4
+  num_layers: 9
+  num_heads: 12
+  hidden_dim: 192
+  mlp_dim: 384
+  num_classes: 10
+
+# TopkViT model configs
+models: 
+  vit:
+    <<: *vit_params
+
+  vit_masked_8:
+    <<: *vit_params
+    k_value: 8
+
+  vit_masked_16:
+    <<: *vit_params
+    k_value: 16
+
+  vit_masked_32:
+    <<: *vit_params
+    k_value: 32
+
+  vit_masked_64:
+    <<: *vit_params
+    k_value: 64
+
+  vit_masked_128:
+    <<: *vit_params
+    k_value: 128
+
+  vit_masked_256:
+    <<: *vit_params
+    k_value: 256
+
+# Training config
+
+dataset_path: "./data"
+save_path: "./models"
+lr: 0.003
+warmup: 10
+weight_decay: 0.05
+num_epochs: 200
+test_interval: 5
