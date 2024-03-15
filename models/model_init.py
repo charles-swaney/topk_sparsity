@@ -1,6 +1,4 @@
-# ViT initialization using https://arxiv.org/pdf/2112.13492.pdf
-
-from models.topk_vit import TopkViT, TopkReLU, init_weights
+from models.topk_vit import TopkViT, init_weights
 from torchvision.models.vision_transformer import VisionTransformer
 
 
@@ -16,7 +14,7 @@ def initialize_model(config):
     )
 
     if 'k_value' in config:
-        model = TopkReLU(model, config['k_value'])
+        model = TopkViT(model, config['k_value'])
 
     for module in model.modules():
         init_weights(module)

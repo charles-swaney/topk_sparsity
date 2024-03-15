@@ -1,5 +1,6 @@
 import torch
 import os 
+import logging
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -15,7 +16,8 @@ def save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=
 
 
 def train(model, config, train_dataloader, test_dataloader, scheduler, device='cuda'):
-    
+    logging.info("Starting training process")
+
     k_value_part = f"_masked_{config['k_value']}" if 'k_value' in config else ""
     experiment_name = f'vit{k_value_part}'
     writer = SummaryWriter(f'runs/{experiment_name}')
@@ -25,7 +27,7 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
     optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
     test_interval = config['test_interval']
     model = model.to(device).train()
-    best_loss = 10 ** 4
+    best_loss = float('inf')
 
     for epoch in range(num_epochs):
         model.train()
@@ -56,9 +58,10 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
         save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_latest_checkpoint.pth')
         writer.add_scalar('Loss/Train', epoch_loss, epoch)
         writer.add_scalar('Accuracy/Train', epoch_accuracy, epoch)
+        logging.info(f"Epoch {epoch+1}/{num_epochs} completed.")
+
 
         if epoch % test_interval == 0 and epoch > 0:
-
             current_loss, test_accuracy = evaluate(model=model, dataloader=test_dataloader, criterion=criterion, device='cuda')
 
             writer.add_scalar('Loss/Test', current_loss, epoch)
@@ -66,7 +69,9 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
 
             if current_loss < best_loss:
                 best_loss = current_loss
+                logging.info("Saving new best model.")
                 save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_best_checkpoint.pth')
+    logging.info("Training completed successfully")
     writer.close()
 
 
