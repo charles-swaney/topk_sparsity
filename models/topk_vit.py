@@ -22,7 +22,7 @@ class TopkViT(nn.Module):
         self.device = config['device']
         self.model = model
         self.k_value = config['k_value']
-        for i in range(config['num_layers']):
+        for i in range(config['num_layers']):  # specific to ViT: replace GeLU module with TopkReLU
             model.encoder.layers[i].mlp[1] = TopkReLU(self.k_value)
             
     def forward(self, x):
@@ -62,15 +62,3 @@ class TopkReLU(nn.Module):
     def forward(self, x):
         x = self.top_k_mask(F.relu(x), self.k)  # Use ReLU because it is easier to compute sparsity.
         return x
-    
-
-def init_weights(m):
-    # Manually initialize the weights of a ViT using xavier normal.
-
-    if isinstance(m, (nn.Linear, nn.Conv2d)):
-        nn.init.xavier_normal_(m.weight)
-        if m.bias is not None:
-            nn.init.constant_(m.bias, 0)
-    elif isinstance(m, nn.LayerNorm):
-        nn.init.constant_(m.bias, 0)
-        nn.init.constant_(m.weight, 1.0)
