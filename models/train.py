@@ -1,5 +1,5 @@
 import torch
-import os 
+import os
 import logging
 from torch.utils.tensorboard import SummaryWriter
 
@@ -24,7 +24,9 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
 
     num_epochs = config['num_epochs']
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], weight_decay=config['weight_decay'])
+    optimizer = torch.optim.Adam(model.parameters(),
+                                 lr=config['lr'],
+                                 weight_decay=config['weight_decay'])
     test_interval = config['test_interval']
     model = model.to(device).train()
     best_loss = float('inf')
@@ -55,14 +57,18 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
 
-        save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_latest_checkpoint.pth')
+        save_checkpoint(model, optimizer, epoch,
+                        dir='models/checkpoints',
+                        filename=f'{experiment_name}_latest_checkpoint.pth')
         writer.add_scalar('Loss/Train', epoch_loss, epoch)
         writer.add_scalar('Accuracy/Train', epoch_accuracy, epoch)
         logging.info(f"Epoch {epoch+1}/{num_epochs} completed.")
 
-
         if epoch % test_interval == 0 and epoch > 0:
-            current_loss, test_accuracy = evaluate(model=model, dataloader=test_dataloader, criterion=criterion, device='cuda')
+            current_loss, test_accuracy = evaluate(model=model,
+                                                   dataloader=test_dataloader,
+                                                   criterion=criterion,
+                                                   device='cuda')
 
             writer.add_scalar('Loss/Test', current_loss, epoch)
             writer.add_scalar('Accuracy/Test', test_accuracy, epoch)
@@ -70,7 +76,9 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
             if current_loss < best_loss:
                 best_loss = current_loss
                 logging.info("Saving new best model.")
-                save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=f'{experiment_name}_best_checkpoint.pth')
+                save_checkpoint(model, optimizer, epoch,
+                                dir='models/checkpoints',
+                                filename=f'{experiment_name}_best_checkpoint.pth')
     logging.info("Training completed successfully")
     writer.close()
 

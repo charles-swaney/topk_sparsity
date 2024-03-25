@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class TopkViT(nn.Module):
     """
     A Vision Transformer with top-k masking applied to the FFN activations in each encoder block.
@@ -14,9 +15,9 @@ class TopkViT(nn.Module):
         - device: 'cuda' if possible
 
     Methods:
-        - forward: uses the same forward pass as self.model 
+        - forward: uses the same forward pass as self.model
     """
-    def __init__(self,  model, config):
+    def __init__(self, model, config):
         super(TopkViT, self).__init__()
         self.device = config['device']
         self.model = model
@@ -27,6 +28,7 @@ class TopkViT(nn.Module):
     def forward(self, x):
         x = x.to(self.device)
         return self.model(x)
+
 
 class TopkReLU(nn.Module):
     """
@@ -58,7 +60,7 @@ class TopkReLU(nn.Module):
         return masked
     
     def forward(self, x):
-        x = self.top_k_mask(F.relu(x), self.k) # Use ReLU because it is easier to compute sparsity.
+        x = self.top_k_mask(F.relu(x), self.k)  # Use ReLU because it is easier to compute sparsity.
         return x
     
 

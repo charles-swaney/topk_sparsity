@@ -13,10 +13,10 @@ def initialize_model(config):
     num_classes=config['num_classes'],
     )
 
-    if 'k_value' in config: # then this should be a top k masked ViT.
+    if 'k_value' in config:  # then this should be a top k masked ViT.
         model = TopkViT(model, config)
 
-    for module in model.modules(): 
+    for module in model.modules():
         init_weights(module)
 
     return model
