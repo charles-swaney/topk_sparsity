@@ -3,3 +3,4 @@ __pychache__/
 data/*
 tensorboard/*
 models/checkpoints/*
+runs/
