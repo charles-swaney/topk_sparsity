@@ -8,6 +8,7 @@ vit_params: &vit_params
   hidden_dim: 192
   mlp_dim: 384
   num_classes: 10
+  device: 'cuda'
 
 # Model configs
 

@@ -20,7 +20,7 @@ def save_checkpoint(
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
     }
-    os.makedirs(dir, exist_ok=True)
+    os.makedirs(base_dir, exist_ok=True)
     torch.save(checkpoint, filepath)
 
 
