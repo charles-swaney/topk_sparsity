@@ -4,8 +4,17 @@ import logging
 from torch.utils.tensorboard import SummaryWriter
 
 
-def save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename='checkpoint.pth'):
-    filepath = os.path.join(dir, filename)
+def save_checkpoint(
+        model,
+        optimizer,
+        epoch,
+        base_dir='models/checkpoints',
+        experiment_name='default',
+        filename='checkpoint.pth'
+):
+    dir_path = os.path.join(base_dir, experiment_name)
+    filepath = os.path.join(dir_path, filename)
+
     checkpoint = {
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -15,9 +24,10 @@ def save_checkpoint(model, optimizer, epoch, dir='models/checkpoints', filename=
     torch.save(checkpoint, filepath)
 
 
-def train(model, config, train_dataloader, test_dataloader, scheduler, device='cuda'):
-    logging.info("Starting training process")
+def train(config, model, train_dataloader, test_dataloader, scheduler, device='cuda'):
+    logging.info("Starting training process.")
 
+    # Set up strings to save model checkpoints and information.
     k_value_part = f"_masked_{config['k_value']}" if 'k_value' in config else ""
     experiment_name = f'vit{k_value_part}'
     writer = SummaryWriter(f'runs/{experiment_name}')
@@ -57,13 +67,22 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
 
-        save_checkpoint(model, optimizer, epoch,
-                        dir='models/checkpoints',
-                        filename=f'{experiment_name}_latest_checkpoint.pth')
+        # Save latest checkpoint for current model
+        save_checkpoint(
+            model,
+            optimizer,
+            epoch,
+            base_dir='models/checkpoints',
+            experiment_name=experiment_name,
+            filename=f'{experiment_name}_latest_checkpoint.pth'
+        )
+
+        # Log to tensorboard
         writer.add_scalar('Loss/Train', epoch_loss, epoch)
         writer.add_scalar('Accuracy/Train', epoch_accuracy, epoch)
         logging.info(f"Epoch {epoch+1}/{num_epochs} completed.")
 
+        # Validation
         if epoch % test_interval == 0 and epoch > 0:
             current_loss, test_accuracy = evaluate(model=model,
                                                    dataloader=test_dataloader,
@@ -76,9 +95,16 @@ def train(model, config, train_dataloader, test_dataloader, scheduler, device='c
             if current_loss < best_loss:
                 best_loss = current_loss
                 logging.info("Saving new best model.")
-                save_checkpoint(model, optimizer, epoch,
-                                dir='models/checkpoints',
-                                filename=f'{experiment_name}_best_checkpoint.pth')
+
+                save_checkpoint(
+                    model,
+                    optimizer,
+                    epoch,
+                    base_dir='models/checkpoints',
+                    experiment_name=experiment_name,
+                    filename=f'{experiment_name}_best_checkpoint.pth'
+                )
+                
     logging.info("Training completed successfully")
     writer.close()
 
