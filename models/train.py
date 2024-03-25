@@ -14,14 +14,27 @@ def save_checkpoint(
 ):
     dir_path = os.path.join(base_dir, experiment_name)
     filepath = os.path.join(dir_path, filename)
+    logging.info(f"Attempting to save checkpoint to: {filepath}.")
 
+    if not os.path.exists(dir_path):
+        logging.info("Directory does not exist, creating directory.")
+        try:
+            os.makedirs(dir_path, exist_ok=True)
+        except Exception as e:
+            logging.error(f"Failed to create dir {dir_path}: {e}")
+            return
+        
     checkpoint = {
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
     }
-    os.makedirs(base_dir, exist_ok=True)
-    torch.save(checkpoint, filepath)
+        
+    try:
+        torch.save(checkpoint, filepath)
+        logging.info("Checkpoint saved.")
+    except Exception as e:
+        logging.error(f"Checkpoint failed to save at {filepath}: {e}")
 
 
 def train(config, model, train_dataloader, test_dataloader, scheduler, device='cuda'):
