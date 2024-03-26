@@ -37,12 +37,17 @@ def save_checkpoint(
         logging.error(f"Checkpoint failed to save at {filepath}: {e}")
 
 
-def train(config, model, train_dataloader, test_dataloader, scheduler):
+def train(
+        config,
+        model,
+        train_dataloader,
+        test_dataloader,
+        scheduler,
+        experiment_name='vit_base'
+    ):
     logging.info("Starting training process.")
 
     # Set up strings to save model checkpoints and information.
-    k_value_part = f"_masked_{config['k_value']}" if 'k_value' in config else ""
-    experiment_name = f'vit{k_value_part}'
     writer = SummaryWriter(f'runs/{experiment_name}')
     device = config['device']
 

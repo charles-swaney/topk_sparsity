@@ -39,6 +39,8 @@ def main():
         logging.error(f"Model name '{args.model_name}' not found in 'config.yaml'.")
         sys.exit(1)
 
+    experiment_name = model_config['experiment_name']
+
     train_loader = load_cifar10(
         root='./data',
         config=config,
@@ -68,7 +70,7 @@ def main():
         warmup_steps=config['warmup_steps']
     )
 
-    train(config, model, train_loader, test_loader, scheduler)
+    train(config, model, train_loader, test_loader, scheduler, experiment_name=experiment_name)
 
 
 if __name__ == '__main__':
