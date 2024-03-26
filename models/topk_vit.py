@@ -22,9 +22,8 @@ class TopkViT(nn.Module):
         self.device = config['device']
         self.model = model
         self.k_value = config['k_value']
-        for i in range(config['num_layers']):  # specific to ViT: replace GeLU module with TopkReLU
-            model.encoder.layers[i].mlp[1] = TopkReLU(self.k_value)
-            
+        replace_activations(self.model, nn.ReLU, TopkReLU())
+                
     def forward(self, x):
         x = x.to(self.device)
         return self.model(x)
@@ -62,3 +61,19 @@ class TopkReLU(nn.Module):
     def forward(self, x):
         x = self.top_k_mask(F.relu(x), self.k)  # Use ReLU because it is easier to compute sparsity.
         return x
+    
+
+def replace_activations(model, old, new):
+    """
+    Recursively replace all activation functions specified by 'old' with 'new'.
+    
+    Parameters:
+        model (nn.Module): The PyTorch model.
+        old (activation function): The activation function to replace.
+        new (activation function): The new activation function.
+    """
+    for name, child in model.named_children():
+        if isinstance(child, old):
+            setattr(model, name, new)
+        else:
+            replace_activations(child, old, new)
