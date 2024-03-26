@@ -37,22 +37,23 @@ def save_checkpoint(
         logging.error(f"Checkpoint failed to save at {filepath}: {e}")
 
 
-def train(config, model, train_dataloader, test_dataloader, scheduler, device='cuda'):
+def train(config, model, train_dataloader, test_dataloader, scheduler):
     logging.info("Starting training process.")
 
     # Set up strings to save model checkpoints and information.
     k_value_part = f"_masked_{config['k_value']}" if 'k_value' in config else ""
     experiment_name = f'vit{k_value_part}'
     writer = SummaryWriter(f'runs/{experiment_name}')
+    device = config['device']
 
     num_epochs = config['num_epochs']
     criterion = torch.nn.CrossEntropyLoss()
+    model = model.to(device).train()
     optimizer = torch.optim.Adam(model.parameters(),
                                  lr=config['lr'],
                                  weight_decay=config['weight_decay'])
     test_interval = config['test_interval']
-    model = model.to(device).train()
-    best_loss = float('inf')
+    best_acc = 0
 
     for epoch in range(num_epochs):
         model.train()
@@ -97,16 +98,16 @@ def train(config, model, train_dataloader, test_dataloader, scheduler, device='c
 
         # Validation
         if epoch % test_interval == 0 and epoch > 0:
-            current_loss, test_accuracy = evaluate(model=model,
+            current_loss, current_acc = evaluate(model=model,
                                                    dataloader=test_dataloader,
                                                    criterion=criterion,
                                                    device='cuda')
 
             writer.add_scalar('Loss/Test', current_loss, epoch)
-            writer.add_scalar('Accuracy/Test', test_accuracy, epoch)
+            writer.add_scalar('Accuracy/Test', current_acc, epoch)
 
-            if current_loss < best_loss:
-                best_loss = current_loss
+            if current_acc > best_acc:
+                best_acc = current_acc
                 logging.info("Saving new best model.")
 
                 save_checkpoint(

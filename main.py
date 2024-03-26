@@ -12,7 +12,7 @@ from models.model_init import initialize_model
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='training.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     parser = argparse.ArgumentParser(
         description="Train a specified model using configuration from config.yaml.")
     parser.add_argument(
@@ -68,7 +68,7 @@ def main():
         warmup_steps=config['warmup_steps']
     )
 
-    train(config, model, train_loader, test_loader, scheduler, device=config['device'])
+    train(config, model, train_loader, test_loader, scheduler)
 
 
 if __name__ == '__main__':
