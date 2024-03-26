@@ -1,7 +1,7 @@
 import torch
 import os
 import logging
-from torch.utils.tensorboard import SummaryWriter
+import csv
 
 
 def save_checkpoint(
@@ -47,8 +47,15 @@ def train(
     ):
     logging.info("Starting training process.")
 
+    with open('training_log.csv', 'w', newline='') as file:
+        train_writer = csv.writer(file)
+        train_writer.writerow(["Epoch", "Loss", "Accuracy"])
+
+    with open('validation_log.csv', 'w', newline='') as file:
+        val_writer = csv.writer(file)
+        val_writer.writerow(["Epoch", "Val_Loss", "Val_Accuracy"])
+
     # Set up strings to save model checkpoints and information.
-    writer = SummaryWriter(f'runs/{experiment_name}')
     device = config['device']
 
     num_epochs = config['num_epochs']
@@ -85,6 +92,7 @@ def train(
 
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
+        train_writer.writerow([epoch, epoch_loss, epoch_accuracy])
 
         # Save latest checkpoint for current model
         save_checkpoint(
@@ -96,9 +104,6 @@ def train(
             filename=f'{experiment_name}_latest_checkpoint.pth'
         )
 
-        # Log to tensorboard
-        writer.add_scalar('Loss/Train', epoch_loss, epoch)
-        writer.add_scalar('Accuracy/Train', epoch_accuracy, epoch)
         logging.info(f"Epoch {epoch+1}/{num_epochs} completed.")
 
         # Validation
@@ -107,13 +112,13 @@ def train(
                                                    dataloader=test_dataloader,
                                                    criterion=criterion,
                                                    device='cuda')
-
-            writer.add_scalar('Loss/Test', current_loss, epoch)
-            writer.add_scalar('Accuracy/Test', current_acc, epoch)
+            
+            val_writer.writerow([epoch, current_loss, current_acc])
 
             if current_acc > best_acc:
                 best_acc = current_acc
                 logging.info("Saving new best model.")
+
 
                 save_checkpoint(
                     model,
@@ -125,7 +130,6 @@ def train(
                 )
                 
     logging.info("Training completed successfully")
-    writer.close()
 
 
 def evaluate(model, dataloader, criterion, device='cuda'):
