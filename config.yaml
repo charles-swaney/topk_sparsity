@@ -15,30 +15,38 @@ vit_params: &vit_params
 models: 
   vit_base:
     <<: *vit_params
+    experiment_name: 'vit_base'
 
   vit_masked_8:
     <<: *vit_params
     k_value: 8
+    experiment_name: 'vit_masked_8'
 
   vit_masked_16:
     <<: *vit_params
     k_value: 16
+    experiment_name: 'vit_masked_16'
+
 
   vit_masked_32:
     <<: *vit_params
     k_value: 32
+    experiment_name: 'vit_masked_32'
 
   vit_masked_64:
     <<: *vit_params
     k_value: 64
+    experiment_name: 'vit_masked_64'
 
   vit_masked_128:
     <<: *vit_params
     k_value: 128
+    experiment_name: 'vit_masked_128'
 
   vit_masked_256:
     <<: *vit_params
     k_value: 256
+    experiment_name: 'vit_masked_256'
 
 # Training config
 
