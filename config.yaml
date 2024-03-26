@@ -1,13 +1,17 @@
+num_labels: 10
+
 # Base ViT config using https://arxiv.org/pdf/2112.13492.pdf
 
 vit_params: &vit_params
+  hidden_size: 192
+  num_hidden_layers: 9
+  num_attention_heads: 12
+  intermediate_size: 384
+  hidden_act: 'relu'
   image_size: 32
   patch_size: 4
-  num_layers: 9
-  num_heads: 12
-  hidden_dim: 192
-  mlp_dim: 384
-  num_classes: 10
+  num_channels: 3
+  num_labels: 10
   device: 'cuda'
 
 # Model configs

@@ -1,6 +1,8 @@
 numpy==1.21.4+computecanada
-Pillow==9.5.0+computecanada
-PyYAML==5.4.1
+Pillow-SIMD==7.0.0.post3+computecanada
+pip==24.0+computecanada
+PyYAML==5.4.1+computecanada
 torch==1.10.0+computecanada
 torchvision==0.11.1+computecanada
 typing_extensions==4.7.1+computecanada
+transformers==4.20.0
