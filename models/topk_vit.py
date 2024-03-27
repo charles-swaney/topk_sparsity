@@ -22,7 +22,7 @@ class TopkViT(nn.Module):
         self.device = config['device']
         self.model = model
         self.k_value = config['k_value']
-        replace_activations(self.model, k=self.k_value)
+        replace_activations(self.model, k_value=self.k_value)
                 
     def forward(self, x):
         x = x.to(self.device)
@@ -65,8 +65,7 @@ class TopkReLU(nn.Module):
 
 def replace_activations(model, k_value):
     """
-    Specifically replace nn.ReLU with TopkReLU in the ViTIntermediate module
-    of the ViTModel's encoder.
+    Specifically replace nn.ReLU with TopkReLU.
 
     Parameters:
     - model: The ViTModel to modify.

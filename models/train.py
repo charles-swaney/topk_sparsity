@@ -47,11 +47,17 @@ def train(
     ):
     logging.info("Starting training process.")
 
-    with open('training_log.csv', 'w', newline='') as file:
+    base_dir = 'logs'
+    experiment_dir = os.path.join(base_dir, experiment_name)
+    os.makedirs(experiment_dir, exist_ok=True)
+    training_log_path = os.path.join(experiment_dir, 'training_log.csv')
+    validation_log_path = os.path.join(experiment_dir, 'validation_log.csv')
+
+    with open(training_log_path, 'w', newline='') as file:
         train_writer = csv.writer(file)
         train_writer.writerow(["Epoch", "Loss", "Accuracy"])
 
-    with open('validation_log.csv', 'w', newline='') as file:
+    with open(validation_log_path, 'w', newline='') as file:
         val_writer = csv.writer(file)
         val_writer.writerow(["Epoch", "Val_Loss", "Val_Accuracy"])
 
