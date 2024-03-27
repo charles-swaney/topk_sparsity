@@ -8,7 +8,7 @@ import torch.optim as optim
 from utils.dataloader import load_cifar10
 from models.train import train
 from utils.scheduler import CosineAnnealingWarmupRestarts
-from models.model_init import initialize_model
+from models.model_init import initialize_vit
 
 
 def main():
@@ -57,7 +57,7 @@ def main():
         persistent_workers=True
     )
 
-    model = initialize_model(model_config).to(config['device'])
+    model = initialize_vit(model_config).to(config['device'])
 
     optimizer = optim.Adam(
         model.parameters(),

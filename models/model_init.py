@@ -1,4 +1,4 @@
-from topk_vit import TopkViT
+from models.topk_vit import TopkViT
 from transformers import ViTConfig, ViTForImageClassification
 
 
@@ -18,6 +18,7 @@ def initialize_vit(model_config):
     model = ViTForImageClassification(config=vit_config)
 
     if 'k_value' in model_config:  # initialize a top-k masked ViT
-        model = TopkViT(model, model_config)
+        masked_model = TopkViT(model, model_config)
+        return masked_model
 
     return model

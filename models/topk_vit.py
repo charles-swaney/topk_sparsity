@@ -22,7 +22,7 @@ class TopkViT(nn.Module):
         self.device = config['device']
         self.model = model
         self.k_value = config['k_value']
-        replace_activations(self.model, nn.ReLU, TopkReLU())
+        replace_activations(self.model, k=self.k_value)
                 
     def forward(self, x):
         x = x.to(self.device)
@@ -47,10 +47,10 @@ class TopkReLU(nn.Module):
     def top_k_mask(self, matrix, k):
         '''
         Inputs:
-            matrix: the matrix to apply the mask to
-            k: number of elements in each row to be nonzero
+            - matrix: the matrix to apply the mask to
+            - k: number of elements in each row to be nonzero
         Outputs:
-            masked: masked version of matrix with only top k within each row nonzero
+            - masked: masked version of matrix with only top k within each row nonzero
       '''
         _, indices = torch.topk(matrix, k, -1)
         mask = torch.zeros_like(matrix)
@@ -63,17 +63,18 @@ class TopkReLU(nn.Module):
         return x
     
 
-def replace_activations(model, old, new):
+def replace_activations(model, k_value):
     """
-    Recursively replace all activation functions specified by 'old' with 'new'.
-    
+    Specifically replace nn.ReLU with TopkReLU in the ViTIntermediate module
+    of the ViTModel's encoder.
+
     Parameters:
-        model (nn.Module): The PyTorch model.
-        old (activation function): The activation function to replace.
-        new (activation function): The new activation function.
+    - model: The ViTModel to modify.
+    - k_value: The 'k' value for TopkReLU.
     """
-    for name, child in model.named_children():
-        if isinstance(child, old):
-            setattr(model, name, new)
-        else:
-            replace_activations(child, old, new)
+    for layer in model.vit.encoder.layer:
+        intermediate_module = layer.intermediate
+        
+        intermediate_module.intermediate_act_fn = TopkReLU(k=k_value)
+
+
