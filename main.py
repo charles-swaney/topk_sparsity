@@ -19,7 +19,7 @@ def main():
         '--model_name',
         type=str,
         required=True,
-        help="Model's name as specified in config.yaml"
+        help="Model's name from available options in config.yaml"
     )
     args = parser.parse_args()
 
@@ -58,7 +58,7 @@ def main():
     )
 
     model = initialize_vit(model_config).to(config['device'])
-
+    print(f'model: {experiment_name} initialized successfully')
     optimizer = optim.Adam(
         model.parameters(),
         lr=config['lr'],

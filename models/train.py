@@ -83,19 +83,20 @@ def train(
             x, y = x.to(device), y.to(device)
 
             output = model(x)
-            loss = criterion(output, y)
+            logits = output.logits if hasattr(output, 'logits') else output[0]
+            loss = criterion(logits, y)
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             
             epoch_loss += loss.item() * x.size(0)
-            _, predicted = torch.max(output, 1)
+            _, predicted = torch.max(logits, 1)
             correct += (predicted == y).sum().item()
             total += y.size(0)
         
         scheduler.step()
-
+        
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
         train_writer.writerow([epoch, epoch_loss, epoch_accuracy])
@@ -148,10 +149,11 @@ def evaluate(model, dataloader, criterion, device='cuda'):
             x, y = x.to(device), y.to(device)
 
             output = model(x)
-            loss = criterion(output, y)
+            logits = output.logits if hasattr(output, 'logits') else output[0]
+            loss = criterion(logits, y)
+            preds = torch.argmax(logits, dim=1)
             test_losses.append(loss.item())
 
-            preds = torch.argmax(output, dim=1)
             num_correct += (preds == y).sum().item()
             test_total += preds.size(0)
 
