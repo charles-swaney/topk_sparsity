@@ -2,6 +2,7 @@ import yaml
 import argparse
 import logging
 import sys
+import os
 
 import torch.optim as optim
 
@@ -12,7 +13,6 @@ from models.model_init import initialize_vit
 
 
 def main():
-    logging.basicConfig(filename='training.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     parser = argparse.ArgumentParser(
         description="Train a specified model using configuration from config.yaml.")
     parser.add_argument(
@@ -21,7 +21,19 @@ def main():
         required=True,
         help="Model's name from available options in config.yaml"
     )
+    parser.add_argument(
+        '--output_directory',
+        type=str,
+        required=True,
+        help="Which directory to output logs."
+    )  
+
     args = parser.parse_args()
+
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    topk_farm_directory = os.path.dirname(script_directory)
+    output_directory_path = os.path.join(topk_farm_directory, args.output_directory)
+    os.makedirs(output_directory_path, exist_ok=True)
 
     try:
         with open('config.yaml', 'r') as file:
@@ -40,6 +52,11 @@ def main():
         sys.exit(1)
 
     experiment_name = model_config['experiment_name']
+
+    log_file_path = os.path.join(output_directory_path, f'{experiment_name}_training.log')
+    logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    logging.info("Starting training")
 
     train_loader = load_cifar10(
         root='./data',
