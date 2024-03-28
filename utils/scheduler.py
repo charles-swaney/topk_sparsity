@@ -87,16 +87,18 @@ class CosineAnnealingWarmupRestarts(_LRScheduler):
         for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
             param_group['lr'] = lr
 
-def build_scheduler(args, optimizer, n_iter_per_epoch):
-    num_steps = int(args.epochs * n_iter_per_epoch)
-    warmup_steps = int(args.warmup * n_iter_per_epoch)
+def build_scheduler(scheduler_config, optimizer, n_iter_per_epoch):
+    num_steps = int(scheduler_config['num_epochs'] * n_iter_per_epoch)
+    warmup_steps = int(scheduler_config['warmup_steps'] * n_iter_per_epoch)
+    min_lr = float(scheduler_config['min_lr'])
+    max_lr = float(scheduler_config['max_lr'])
 
     lr_scheduler = CosineAnnealingWarmupRestarts(
         optimizer,
         first_cycle_steps=num_steps,
         cycle_mult=1.,
-        max_lr = args.lr,
-        min_lr = 1e-6,
+        max_lr = max_lr,
+        min_lr = min_lr,
         warmup_steps=warmup_steps
         )
     return lr_scheduler

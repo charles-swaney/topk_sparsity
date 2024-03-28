@@ -89,13 +89,12 @@ def train(
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
+            scheduler.step()
+
             epoch_loss += loss.item() * x.size(0)
             _, predicted = torch.max(logits, 1)
             correct += (predicted == y).sum().item()
             total += y.size(0)
-        
-        scheduler.step()
         
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
