@@ -8,7 +8,7 @@ import torch.optim as optim
 
 from utils.dataloader import load_cifar10
 from models.train import train
-from utils.scheduler import CosineAnnealingWarmupRestarts
+from utils.scheduler import build_scheduler
 from models.model_init import initialize_vit
 
 
@@ -81,11 +81,10 @@ def main():
         lr=config['lr'],
         weight_decay=config['weight_decay']
     )
-    scheduler = CosineAnnealingWarmupRestarts(
-        optimizer=optimizer,
-        first_cycle_steps=config['first_cycle_steps'],
-        warmup_steps=config['warmup_steps']
-    )
+    # set up scheduler
+    n_iter_per_epoch = len(train_loader)
+    scheduler_config = config['scheduler']
+    scheduler = build_scheduler(scheduler_config, optimizer, n_iter_per_epoch)
 
     train(config, model, train_loader, test_loader, scheduler, experiment_name=experiment_name)
 
