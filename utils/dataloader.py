@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader
 def load_cifar10(config, root='./data', train=True, download=True, **kwargs):
     if config is None:
         raise ValueError('No config.')
+    
+    persistent_workers = kwargs.get('persistent_workers', False)
 
     train_batch_size = config['train_batch_size']
     test_batch_size = config['test_batch_size']
@@ -38,7 +40,8 @@ def load_cifar10(config, root='./data', train=True, download=True, **kwargs):
                 dataset,
                 batch_size=train_batch_size,
                 shuffle=True,
-                num_workers=num_workers
+                num_workers=num_workers,
+                persistent_workers=persistent_workers
             )
         except Exception as e:
             logging.error(f"Failed to create DataLoader: {e}")
@@ -56,7 +59,8 @@ def load_cifar10(config, root='./data', train=True, download=True, **kwargs):
                 dataset,
                 batch_size=test_batch_size,
                 shuffle=False,
-                num_workers=num_workers
+                num_workers=num_workers,
+                persistent_workers=persistent_workers
             )
         except Exception as e:
             logging.error(f"Failed to create DataLoader: {e}")
