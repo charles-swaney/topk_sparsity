@@ -53,15 +53,15 @@ def train(
     training_log_path = os.path.join(experiment_dir, 'training_log.csv')
     validation_log_path = os.path.join(experiment_dir, 'validation_log.csv')
 
-    with open(training_log_path, 'w', newline='') as file:
-        train_writer = csv.writer(file)
+    # Initialize log files with headers outside the training loop.
+    with open(training_log_path, 'w', newline='') as train_file:
+        train_writer = csv.writer(train_file)
         train_writer.writerow(["Epoch", "Loss", "Accuracy"])
 
-    with open(validation_log_path, 'w', newline='') as file:
-        val_writer = csv.writer(file)
+    with open(validation_log_path, 'w', newline='') as val_file:
+        val_writer = csv.writer(val_file)
         val_writer.writerow(["Epoch", "Val_Loss", "Val_Accuracy"])
 
-    # Set up strings to save model checkpoints and information.
     device = config['device']
 
     num_epochs = config['num_epochs']
@@ -99,7 +99,9 @@ def train(
         
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
-        train_writer.writerow([epoch, epoch_loss, epoch_accuracy])
+        with open(training_log_path, 'a', newline='') as train_file:
+            train_writer=csv.writer(train_file)
+            train_writer.writerow([epoch, epoch_loss, epoch_accuracy])
 
         # Save latest checkpoint for current model
         save_checkpoint(
@@ -120,7 +122,9 @@ def train(
                                                    criterion=criterion,
                                                    device='cuda')
             
-            val_writer.writerow([epoch, current_loss, current_acc])
+            with open(validation_log_path, 'a', newline='') as val_file:
+                val_writer = csv.writer(val_file)
+                val_writer.writerow([epoch, current_loss, current_acc])
 
             if current_acc > best_acc:
                 best_acc = current_acc
@@ -160,5 +164,4 @@ def evaluate(model, dataloader, criterion, device='cuda'):
     test_accuracy = num_correct / test_total
     mean_loss = sum(test_losses) / len(test_losses)
 
-    print(f'Test Loss: {mean_loss}, Test Accuracy: {test_accuracy}')
     return mean_loss, test_accuracy
