@@ -76,7 +76,7 @@ def main():
 
     model = initialize_vit(model_config).to(config['device'])
     print(f'model: {experiment_name} initialized successfully')
-    optimizer = optim.Adam(
+    optimizer = optim.AdamW(
         model.parameters(),
         lr=config['lr'],
         weight_decay=config['weight_decay']
