@@ -5,6 +5,8 @@ Following training regime described in: https://arxiv.org/pdf/2112.13492.pdf
 
 Code adapted in part from: https://github.com/aanna0701/SPT_LSA_ViT
 
+Cosine Annealing Warmup implemention from: https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup
+
 ## Dependencies
 
 This project requires Python $3.7.7$ and pip version $24.0$ or newer. For the following libraries, any versions at least as up-to-date as the following will work:
