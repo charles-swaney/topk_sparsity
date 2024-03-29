@@ -10,7 +10,8 @@ def save_checkpoint(
         epoch,
         base_dir='models/checkpoints',
         experiment_name='default',
-        filename='checkpoint.pth'
+        filename='checkpoint.pth',
+        scheduler=None
 ):
     dir_path = os.path.join(base_dir, experiment_name)
     filepath = os.path.join(dir_path, filename)
@@ -29,6 +30,9 @@ def save_checkpoint(
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
     }
+
+    if scheduler is not None:
+        checkpoint['scheduler_state_dict'] = scheduler.state_dict()
         
     try:
         torch.save(checkpoint, filepath)
@@ -69,6 +73,7 @@ def train(
     criterion = torch.nn.CrossEntropyLoss()
     model = model.to(device).train()
     test_interval = config['test_interval']
+    periodic_save_interval = config['periodic_save_interval']
     best_acc = 0
 
     for epoch in range(1, num_epochs + 1):
@@ -87,13 +92,14 @@ def train(
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            if scheduler is not None:
-                scheduler.step()
+            
 
             epoch_loss += loss.item() * x.size(0)
             _, predicted = torch.max(logits, 1)
             correct += (predicted == y).sum().item()
             total += y.size(0)
+        
+        scheduler.step()
         
         epoch_loss = epoch_loss / len(train_dataloader.dataset)
         epoch_accuracy = correct / total
@@ -108,13 +114,26 @@ def train(
             epoch,
             base_dir='models/checkpoints',
             experiment_name=experiment_name,
-            filename=f'{experiment_name}_latest_checkpoint.pth'
+            filename=f'{experiment_name}_latest_checkpoint.pth',
+            scheduler=scheduler
         )
 
-        logging.info(f"Epoch {epoch+1}/{num_epochs} completed.")
+        # Periodically save checkpoints
+        if epoch % periodic_save_interval == 0:
+            save_checkpoint(
+                model,
+                optimizer,
+                epoch,
+                base_dir='models/checkpoints',
+                experiment_name=experiment_name,
+                filename=f'{experiment_name}_epoch_{epoch}_checkpoint.pth',
+                scheduler=scheduler
+        )   
+
+        logging.info(f"Epoch {epoch}/{num_epochs} completed.")
 
         # Validation
-        if epoch % test_interval == 0 and epoch > 0:
+        if epoch % test_interval == 0:
             current_loss, current_acc = evaluate(model=model,
                                                    dataloader=test_dataloader,
                                                    criterion=criterion,
@@ -135,7 +154,8 @@ def train(
                     epoch,
                     base_dir='models/checkpoints',
                     experiment_name=experiment_name,
-                    filename=f'{experiment_name}_best_checkpoint.pth'
+                    filename=f'{experiment_name}_best_checkpoint.pth',
+                    scheduler=scheduler
                 )
                 
     logging.info("Training completed successfully")
