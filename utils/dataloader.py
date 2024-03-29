@@ -1,7 +1,7 @@
 import logging
 
 from torchvision import datasets
-from torchvision.transforms import Compose, ToTensor, Normalize, AutoAugment
+from torchvision.transforms import Compose, ToTensor, Normalize, AutoAugment, AutoAugmentPolicy
 from torch.utils.data import DataLoader
 
 
@@ -16,7 +16,7 @@ def load_cifar10(config, root='./data', train=True, download=True, **kwargs):
     num_workers = config['num_workers']
 
     train_transform = Compose([
-        AutoAugment(),
+        AutoAugment(policy=AutoAugmentPolicy.CIFAR10),
         ToTensor(),
         Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]),
     ])
