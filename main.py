@@ -86,7 +86,7 @@ def main():
     scheduler_config = config['scheduler']
     scheduler = build_scheduler(scheduler_config, optimizer, n_iter_per_epoch)
 
-    train(config, model, train_loader, test_loader, scheduler, experiment_name=experiment_name)
+    train(config, model, train_loader, test_loader, optimizer, scheduler, experiment_name=experiment_name)
 
 
 if __name__ == '__main__':

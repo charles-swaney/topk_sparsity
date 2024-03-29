@@ -42,6 +42,7 @@ def train(
         model,
         train_dataloader,
         test_dataloader,
+        optimizer,
         scheduler,
         experiment_name='vit_base'
     ):
@@ -67,13 +68,10 @@ def train(
     num_epochs = config['num_epochs']
     criterion = torch.nn.CrossEntropyLoss()
     model = model.to(device).train()
-    optimizer = torch.optim.Adam(model.parameters(),
-                                 lr=config['lr'],
-                                 weight_decay=config['weight_decay'])
     test_interval = config['test_interval']
     best_acc = 0
 
-    for epoch in range(num_epochs):
+    for epoch in range(1, num_epochs + 1):
         model.train()
         epoch_loss = 0.0
         correct = 0
@@ -89,7 +87,8 @@ def train(
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            if scheduler is not None:
+                scheduler.step()
 
             epoch_loss += loss.item() * x.size(0)
             _, predicted = torch.max(logits, 1)
