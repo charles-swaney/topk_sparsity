@@ -29,7 +29,7 @@ def adv_attacks():
         '--load_save_state',
         type=str,
         required=True,
-        help="Which save state from models/checkpoints/ to load."
+        help="Save state from models/checkpoints, e.g. best_checkpoint or latest_checkpoint."
     )
     args = parser.parse_args()
 
@@ -68,7 +68,7 @@ def adv_attacks():
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
-    logging.info("Starting training")
+    logging.info("Starting Adversarial Computations")
 
     test_loader = load_cifar10(
         root='./data',
