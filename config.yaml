@@ -80,3 +80,9 @@ cos_annealing:
 multistep_lr:
   milestones: [100, 150, 200, 250, 300]
   gamma: 0.15
+
+# Adversarial attacks
+
+epsilons: [0, .05, .1, .15, .20, .25, .3, .35]
+cifar_mean: [0.4914, 0.4822, 0.4465]
+cifar_std: [0.2023, 0.1994, 0.2010]
