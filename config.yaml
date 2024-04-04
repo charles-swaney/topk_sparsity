@@ -19,6 +19,11 @@ models:
     <<: *vit_params
     experiment_name: 'vit_base'
 
+  vit_masked_4:
+    <<: *vit_params
+    k_value: 4
+    experiment_name: 'vit_masked_4'
+
   vit_masked_8:
     <<: *vit_params
     k_value: 8
@@ -54,10 +59,10 @@ models:
 dataset_path: "./data"
 save_path: "./models"
 lr: 0.003
-num_epochs: 350
+num_epochs: 400
 weight_decay: 0.05
 test_interval: 5
-periodic_save_interval: 35 
+periodic_save_interval: 40
 device: 'cuda'
 
 # Dataloader config
@@ -66,13 +71,12 @@ train_batch_size: 128
 test_batch_size: 512
 num_workers: 4
 
-
 # Scheduler configs
 
 cos_annealing:
   first_cycle_steps: 100
   cycle_mult: 1
-  max_lr: 0.009
+  max_lr: 0.003
   min_lr: 1e-6
   warmup_steps: 10
   gamma: 0.9
