@@ -36,6 +36,7 @@ def denorm(batch, mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]):
 
 
 def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
+    model = model.to(device).eval()
     correct = 0
     logging.info("Beginning adversarial tests.")
     base_dir = 'logs'
@@ -56,11 +57,13 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
             data.requires_grad = True
 
             output = model(data)
-            init_pred = output.max(1, keepdim=True)[1]
+            logits = output.logits if hasattr(output, 'logits') else output[0]
+            init_pred = logits.max(1, keepdim=True)[1]
 
             if init_pred.item() != target.item():
                 continue
-            loss = F.nll_loss(output, target)
+
+            loss = F.cross_entropy(logits, target)
             model.zero_grad()
             loss.backward()
             data_grad = data.grad.data
@@ -71,8 +74,9 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
                 mean=mean, std=std)(perturbed_data)
 
             output = model(perturbed_data_normalized)
+            logits = output.logits if hasattr(output, 'logits') else output[0]
 
-            final_pred = output.max(1, keepdim=True)[1]
+            final_pred = logits.max(1, keepdim=True)[1]
             if final_pred.item() == target.item():
                 correct += 1
 

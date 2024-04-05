@@ -14,6 +14,10 @@ def load_cifar10(config, root='./data', train=True, download=True, **kwargs):
 
     train_batch_size = config['train_batch_size']
     test_batch_size = config['test_batch_size']
+
+    if 'adv_batch_size' in kwargs and not train:
+        test_batch_size = kwargs['adv_batch_size']
+
     num_workers = config['num_workers']
 
     train_transform = Compose([

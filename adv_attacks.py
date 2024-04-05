@@ -75,7 +75,8 @@ def adv_attacks():
         config=config,
         train=False,
         download=True,
-        persistent_workers=True
+        persistent_workers=True,
+        adv_batch_size=config['adv_batch_size']
     )
 
     model = initialize_vit(model_config=model_config).to(device)
