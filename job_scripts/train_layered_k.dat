@@ -1,0 +1,7 @@
+1 --model_name vit_masked_128_to_16 --output_directory RUN1 --scheduler cos_annealing
+2 --model_name vit_masked_256_to_16 --output_directory RUN2 --scheduler cos_annealing
+3 --model_name vit_masked_128_to_8 --output_directory RUN3 --scheduler cos_annealing
+4 --model_name vit_masked_256_to_8 --output_directory RUN4 --scheduler cos_annealing
+5 --model_name vit_masked_384_to_8 --output_directory RUN5 --scheduler cos_annealing
+6 --model_name vit_masked_384_to_16 --output_directory RUN6 --scheduler cos_annealing
+7 --model_name vit_masked_384_to_32 --output_directory RUN7 --scheduler cos_annealing

@@ -1,0 +1,8 @@
+1 --model_name vit_base --output_directory RUN1 --load_save_state best_checkpoint
+2 --model_name vit_masked_4 --output_directory RUN2 --load_save_state best_checkpoint
+3 --model_name vit_masked_8 --output_directory RUN3 --load_save_state best_checkpoint
+4 --model_name vit_masked_16 --output_directory RUN4 --load_save_state best_checkpoint
+5 --model_name vit_masked_32 --output_directory RUN5 --load_save_state best_checkpoint
+6 --model_name vit_masked_64 --output_directory RUN6 --load_save_state best_checkpoint
+7 --model_name vit_masked_128 --output_directory RUN7 --load_save_state best_checkpoint
+8 --model_name vit_masked_256 --output_directory RUN8 --load_save_state best_checkpoint
