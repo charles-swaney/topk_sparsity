@@ -41,7 +41,7 @@ models:
 
   vit_masked_64:
     <<: *vit_params
-    k_value: 64
+    k_values: 64
     experiment_name: 'vit_masked_64'
 
   vit_masked_128:
@@ -53,6 +53,104 @@ models:
     <<: *vit_params
     k_value: 256
     experiment_name: 'vit_masked_256'
+
+  vit_masked_128_to_16:
+    <<: *vit_params
+    k_values:
+      - 128
+      - 128
+      - 128
+      - 64
+      - 64
+      - 32
+      - 32
+      - 16
+      - 16
+    experiment_name: 'vit_masked_128_to_16'
+
+  vit_masked_256_to_16:
+    <<: *vit_params
+    k_values:
+      - 256
+      - 256
+      - 128
+      - 128
+      - 64
+      - 64
+      - 32
+      - 16
+      - 16
+    experiment_name: 'vit_masked_256_to_16'
+
+  vit_masked_128_to_8:
+    <<: *vit_params
+    k_values:
+      - 128
+      - 128
+      - 64
+      - 64
+      - 32
+      - 32
+      - 16
+      - 8
+      - 8
+    experiment_name: 'vit_masked_128_to_8'
+
+  vit_masked_256_to_8:
+    <<: *vit_params
+    k_values:
+      - 256
+      - 256
+      - 128
+      - 128
+      - 64
+      - 32
+      - 16
+      - 8
+      - 8
+    experiment_name: 'vit_masked_256_to_8'
+
+  vit_masked_384_to_8:
+    <<: *vit_params
+    k_values:
+      - 384
+      - 384
+      - 256
+      - 128
+      - 64
+      - 32
+      - 16
+      - 8
+      - 8
+    experiment_name: 'vit_masked_384_to_8'
+
+  vit_masked_384_to_16:
+    <<: *vit_params
+    k_values:
+      - 384
+      - 384
+      - 256
+      - 128
+      - 128
+      - 64
+      - 32
+      - 16
+      - 16
+    experiment_name: 'vit_masked_384_to_16'
+
+  vit_masked_384_to_32:
+    <<: *vit_params
+    k_values:
+      - 384
+      - 384
+      - 256
+      - 256
+      - 128
+      - 128
+      - 64
+      - 32
+      - 32
+    experiment_name: 'vit_masked_384_to_32'
 
 # Training config
 

@@ -10,8 +10,8 @@ class TopkViT(nn.Module):
 
     Attributes:
         - model: the underlying model on which the masking is applied
-        - config: a config file which must contain at least the keys 'k_value' representing the
-                k value in the masking, and 'num_layers', representing the model's depth
+        - config: a config file which must contain at least the keys 'k_values' representing the
+                list of k values in the masking, and 'num_layers', representing the model's depth
         - device: 'cuda' if possible
 
     Methods:
@@ -21,8 +21,8 @@ class TopkViT(nn.Module):
         super(TopkViT, self).__init__()
         self.device = config['device']
         self.model = model
-        self.k_value = config['k_value']
-        replace_activations(self.model, k_value=self.k_value)
+        self.k_values = config['k_values']
+        replace_activations(self.model, k_value=self.k_values)
                 
     def forward(self, x):
         x = x.to(self.device)
@@ -63,17 +63,20 @@ class TopkReLU(nn.Module):
         return x
     
 
-def replace_activations(model, k_value):
+def replace_activations(model, k_values):
     """
     Specifically replace nn.ReLU with TopkReLU.
 
     Parameters:
     - model: The ViTModel to modify.
-    - k_value: The 'k' value for TopkReLU.
+    - k_values: A list of k-values to be used.
     """
-    for layer in model.vit.encoder.layer:
+    num_layers = len(model.vit.encoder.layer)
+    if len(k_values) != num_layers:
+        raise ValueError(f"Expected {num_layers} k_values, but received {len(k_values)}.")
+    
+    for layer, k_value in zip(model.vit.encoder.layer, k_values):    
         intermediate_module = layer.intermediate
-        
         intermediate_module.intermediate_act_fn = TopkReLU(k=k_value)
 
 

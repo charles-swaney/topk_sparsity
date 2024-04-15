@@ -16,9 +16,15 @@ def initialize_vit(model_config):
         device=model_config['device']
     )
     model = ViTForImageClassification(config=vit_config)
+    config_for_masking = model_config.copy()
 
-    if 'k_value' in model_config:  # initialize a top-k masked ViT
-        masked_model = TopkViT(model, model_config)
-        return masked_model
+    if 'k_values' in model_config:  # initialize a top-k masked ViT
+        return TopkViT(model, config_for_masking)
+
+    elif 'k_value' in model_config: 
+        # topkvit expects input config to contain key 'k_values'
+        k_list = [model_config['k_value'] for _ in range(model_config['num_hidden_layers'])]
+        config_for_masking['k_values'] = k_list
+        return TopkViT(model, config_for_masking)
 
     return model
