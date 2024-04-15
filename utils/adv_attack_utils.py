@@ -10,7 +10,7 @@ device = 'cuda'
 
 def fgsm_attack(image, epsilon, data_grad):
     sign_data_grad = data_grad.sign()
-    perturbed_image = image + epsilon * sign_data_grad
+    perturbed_image = image + epsilon*sign_data_grad
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
     return perturbed_image
 
@@ -49,7 +49,7 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
         train_writer = csv.writer(adv_file)
         train_writer.writerow(["Epsilon", "Test_Acc"])
 
-    for eps in epsilons:
+    for epsilon in epsilons:
         correct = 0
         for data, target in test_loader:
 
@@ -57,7 +57,7 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
             data.requires_grad = True
 
             output = model(data)
-            logits = output.logits if hasattr(output, 'logits') else output[0]
+            logits = output.logits
             init_pred = logits.max(1, keepdim=True)[1]
 
             if init_pred.item() != target.item():
@@ -69,12 +69,12 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
             data_grad = data.grad.data
 
             data_denorm = denorm(data)
-            perturbed_data = fgsm_attack(data_denorm, eps, data_grad)
-            perturbed_data_normalized = transforms.Normalize(
-                mean=mean, std=std)(perturbed_data)
+
+            perturbed_data = fgsm_attack(data_denorm, epsilon, data_grad)
+            perturbed_data_normalized = transforms.Normalize(mean=mean, std=std)(perturbed_data)
 
             output = model(perturbed_data_normalized)
-            logits = output.logits if hasattr(output, 'logits') else output[0]
+            logits = output.logits
 
             final_pred = logits.max(1, keepdim=True)[1]
             if final_pred.item() == target.item():
@@ -83,10 +83,10 @@ def adv_test(model, device, test_loader, mean, std, epsilons, experiment_name):
         final_acc = correct / float(len(test_loader))
         with open(adv_log_path, 'a', newline='') as adv_file:
             adv_writer = csv.writer(adv_file)
-            adv_writer.writerow([eps, final_acc])
+            adv_writer.writerow([epsilon, final_acc])
 
         logging.info(
-            f"Epsilon: {eps}\tTest Accuracy = {correct} / {len(test_loader)} = {final_acc}"
+            f"Epsilon: {epsilon}\tTest Accuracy = {correct} / {len(test_loader)} = {final_acc}"
         )
 
     logging.info("Adversarial computations complete.")
